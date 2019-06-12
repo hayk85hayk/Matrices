@@ -19,7 +19,6 @@ public:
 	}
 };
 
-
 Matrix add_matrix(Matrix a, Matrix b) {
 	int i, j;
 	Matrix result(a.row, a.column);
@@ -30,6 +29,7 @@ Matrix add_matrix(Matrix a, Matrix b) {
 	}
 	return result;
 }
+
 Matrix multiply_matrix(Matrix a, Matrix b)
 	{
 		unsigned i, j, k;
@@ -60,54 +60,38 @@ void print_matrix(Matrix a) {
 	}
 }
 
-void matrix_from_ifstream(Matrix a, ifstream file, int m, int n) {
+Matrix matrix_from_ifstream(ifstream &file, int m, int n) {
+	Matrix a(m, n);
 	for (int i = 0; i < m; i++) {
 		for (int j = 0; j < n; j++) {
 			file >> a.matrix[i][j];
 		}
 	}
+	return a;
 }
 
 int main() {
-	// defining paths to the files
-	string path_a = "A.txt", path_b = "B.txt", path_c = "C.txt", path_d = "D.txt", path_y = "Y.txt";
+	string path_a = "A.txt", path_b = "B.txt", path_c = "C.txt", path_d = "D.txt", path_y = "Y.txt";// defining paths to the files
 	string elm, sizes_a, sizes_b, sizes_c, sizes_d;
 	ifstream afile, bfile, cfile, dfile;
 	ofstream yfile;
-	// opening files
-	afile.open(path_a), bfile.open(path_b), cfile.open(path_c), dfile.open(path_d), yfile.open(path_y);
+	afile.open(path_a), bfile.open(path_b), cfile.open(path_c), dfile.open(path_d), yfile.open(path_y);// opening files
 	if (afile.is_open() && bfile.is_open() && cfile.is_open() && dfile.is_open() && yfile.is_open())
 	{
 		int qty = 1;
 		while (!afile.eof())
 		{
 			getline(afile, sizes_a), getline(bfile, sizes_b), getline(cfile, sizes_c), getline(dfile, sizes_d);
-			assert(sizes_a == sizes_b, "Sizes don't match");
+			assert(sizes_a == sizes_b && "Sizes don't match");
 			while (sizes_a[0] == '#') 
 			{
 				yfile << '#' << qty;
 				int m = sizes_a[2] - '0', n = m;
 				Matrix a(m, n), b(m, n), c(m, n), d(m, n), y(m, n), tmp1(m, n), tmp2(m, n);
-				for (int i = 0; i < m; i++) {
-					for (int j = 0; j < n; j++) {
-						afile >> a.matrix[i][j];
-					}
-				}
-				for (int i = 0; i < m; i++) {
-					for (int j = 0; j < n; j++) {
-						bfile >> b.matrix[i][j];
-					}
-				}
-				for (int i = 0; i < m; i++) {
-					for (int j = 0; j < n; j++) {
-						cfile >> c.matrix[i][j];
-					}
-				}
-				for (int i = 0; i < m; i++) {
-					for (int j = 0; j < n; j++) {
-						dfile >> d.matrix[i][j];
-					}
-				}
+				a = matrix_from_ifstream(afile, m, n);
+				b = matrix_from_ifstream(bfile, m, n);
+				c = matrix_from_ifstream(cfile, m, n);
+				d = matrix_from_ifstream(dfile, m, n);
 				tmp1 = add_matrix(a, b);
 				tmp2 = add_matrix(c, d);
 				y = multiply_matrix(tmp1, tmp2);
@@ -123,6 +107,8 @@ int main() {
 			}
 		}
 		afile.close(), bfile.close(), cfile.close(), dfile.close(), yfile.close(); // closing files
+		cout << "Operation is done" << endl;
+		cin.get();
 	}
 
 	else cout << "Unable to open file";
